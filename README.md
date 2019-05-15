@@ -38,7 +38,7 @@ Then, run the attacker on one hyperthread as root: `sudo taskset -c 3 ./leak`
 Variant 2 does not require privileges but it only works on Windows. 
 
 ##### Run
-Run the attacker on one hyperthread: `taskset -c 3 ./leak`. It takes a while (up to 1 minute) until the leakage starts, as the PoC has to wait for Windows to collect information about the memory used by the PoC. Starting a different program which uses memory (e.g., a browser) sometimes reduces the waiting time. 
+Run the attacker on one hyperthread: `start /affinity 3 \.leak.exe`. It takes a while (up to 1 minute) until the leakage starts, as the PoC has to wait for Windows to collect information about the memory used by the PoC. Starting a different program which uses memory (e.g., a browser) sometimes reduces the waiting time. 
 
 
 ## Victim Applications
@@ -78,9 +78,15 @@ An example output is as follows (for the secret letter 'X' loaded by the victim)
 
 An unprivileged user application which constantly loads the same value from its memory. 
 
-##### Run
+##### Run (Linux)
 
 Simply run the victim on the same physical core but a different hyperthread as the attacker: `taskset -c 7 ./secret`. You can also provide a secret letter to the victim application as a parameter, e.g., `taskset -c 7 ./secret B` to access memory containing 'B's. The default secret letter is 'X'. 
+
+As soon as the victim is started, there should be a clear signal in the attacker process, i.e., the bar for the leaked letter should get longer. 
+
+##### Run (Windows)
+
+Simply run the victim on the same physical core but a different hyperthread as the attacker: `start /affinity 7 .\secret.exe`. You can also provide a secret letter to the victim application as a parameter, e.g., `start /affinity 7 .\secret.exe B` to access memory containing 'B's. The default secret letter is 'X'. 
 
 As soon as the victim is started, there should be a clear signal in the attacker process, i.e., the bar for the leaked letter should get longer. 
 
