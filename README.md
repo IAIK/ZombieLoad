@@ -38,7 +38,7 @@ Then, run the attacker on one hyperthread as root: `sudo taskset -c 3 ./leak`
 Variant 2 does not require privileges but it only works on Windows. 
 
 ##### Run
-Run the attacker on one hyperthread: `start /affinity 3 \.leak.exe`. It takes a while (up to 1 minute) until the leakage starts, as the PoC has to wait for Windows to collect information about the memory used by the PoC. Starting a different program which uses memory (e.g., a browser) sometimes reduces the waiting time. 
+Run the attacker on one hyperthread: `start /affinity 3 .\leak.exe`. It takes a while (up to 1 minute) until the leakage starts, as the PoC has to wait for Windows to collect information about the memory used by the PoC. Starting a different program which uses memory (e.g., a browser) sometimes reduces the waiting time. 
 
 
 ## Victim Applications
