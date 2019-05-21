@@ -126,6 +126,7 @@ Where `X` is the secret character. There should be a clear signal in the attacke
 * **How do I know which core IDs are hyperthreads?**
 
     On Linux, you can run `lscpu -e`. This gives you a list of logical cores and their corresponding physical core. Cores mapping to the same physical core are hyperthreads. 
+    On Windows, you can use the [coreinfo tool from Windows Sysinternals](https://docs.microsoft.com/en-us/sysinternals/downloads/coreinfo). 
 
 * **Can I run the PoC in a virtual machine?**
 
