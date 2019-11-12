@@ -6,12 +6,12 @@ This repository contains several applications, demonstrating ZombieLoad. For tec
 
 ## Proof of Concepts
 
-This repository contains two different proof-of-concept attacks showing ZombieLoad. It also includes four different victim applications to test the leakage in various scenarios. 
+This repository contains four different proof-of-concept attacks showing ZombieLoad. It also includes four different victim applications to test the leakage in various scenarios. 
 
-All demos are tested with an Intel Core i7-8650U, but they should work on any Linux system with any modern Intel Core or Xeon CPU since 2011. 
-We provide one variant for Linux, which we tested on Ubuntu 18.04.1 LTS, and one variant for Windows, which we tested on Windows 10 (1803 build 17134.706). 
+All demos are tested with an Intel Core i7-8650U, but they should work on any Linux system with any modern Intel Core or Xeon CPU since 2010. 
+We provide three variants for Linux, which we tested on Ubuntu 18.04.1 LTS, and two variants for Windows, which we tested on Windows 10 (1803 build 17134.706). 
 
-For best results, we recommend a fast CPU. 
+For best results, we recommend a fast CPU that supports Intel TSX (e.g. nearly any Intel Core i7-5xxx, i7-6xxx, or i7-7xxx). 
 
 ## Building
 
@@ -22,7 +22,7 @@ Building an attacker or a victim is as simple as running `make` in the folder of
 
 ## Attacker Variants
 
-The repository contains two different attacker variants.
+The repository contains four different attacker variants.
 
 ### Variant 1 (Linux only)
 
@@ -33,13 +33,31 @@ Variant 1 is the fastest, easiest and most stable variant for a privileged attac
 For this variant, KASLR and KPTI have to be disabled. This can be achieved by providing `nopti nokaslr` to the kernel command line. 
 Then, run the attacker on one hyperthread as root: `sudo taskset -c 3 ./leak`
 
-### Variant 2 (Windows only)
+### Variant 2 (Linux and Windows)
 
-Variant 2 does not require privileges but it only works on Windows. 
+Variant 2 is a fast variant which does not require any privileges. However, it only works on CPUs supporting Intel TSX. Variant 2 is the only variant which also works on CPUs which already have hardware mitigations for Meltdown and Foreshadow. 
+
+##### Run
+Simply run the attacker on one hyperthread: `taskset -c 3 ./leak`
+
+### Variant 3 (Windows only)
+
+Variant 3 does not require any CPU features or privileges but it only works on Windows. 
 
 ##### Run
 Run the attacker on one hyperthread: `start /affinity 3 .\leak.exe`. It takes a while (up to 1 minute) until the leakage starts, as the PoC has to wait for Windows to collect information about the memory used by the PoC. Starting a different program which uses memory (e.g., a browser) sometimes reduces the waiting time. 
 
+### Variant 4 (Linux only)
+
+Variant 4 is an interesting special subtype of Variant 2 which only works on CPUs supporting both Intel TSX and SGX. This variant abuses abort page semantics when accessing processor reserved memory in non-enclave mode, and hence requires either permissions to create an enclave or root privileges.
+
+##### Run
+The demonstrator for this variant requires read access to Linux's `/dev/cpu/CPUNUM/msr` and `/dev/mem` virtual devices. This can be achieved by loading the `msr` driver, plus a small custom driver to lift Linux's default CONFIG_STRICT_DEVMEM restrictions:
+```bash
+$ sudo modprobe msr
+$ cd module && make load
+```
+Then, run the attacker on one hyperthread as root: `sudo taskset -c 3 ./leak`
 
 ## Victim Applications
 
@@ -140,6 +158,7 @@ Where `X` is the secret character. There should be a clear signal in the attacke
     * If you run it on a mobile device (e.g., a laptop), ensure that it is plugged in to get the best performance.
     * Try to pin the tools to a specific CPU core (e.g. with taskset). Also try different cores and core combinations. Leaking values only works if attacker and victim run on the same physical core. 
     * Vary the load on your computer. On some machines it works better if the load is higher, on others it works better if the load is lower.
+    * Use a different variant of ZombieLoad. In this repository, we provide 3 different techniques for the attacker. 
     * Try to restart the demos and also your computer. Especially after a standby, the timings are broken on some computers. 
 
 ## Warnings
